@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Hybrid Network Command Center - CYBERGENOME AI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}
+body{background:#0a1628;color:#e0e0e0;padding-bottom:50px}
+.header{background:linear-gradient(135deg,#0d2137,#1a3a5c);padding:20px 40px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1e88e5}
+.header h1{color:#4fc3f7;font-size:22px}
+.container{max-width:1300px;margin:20px auto;padding:0 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-bottom:25px}
+.pc-card{background:#111d2e;border-radius:10px;padding:18px;border:2px solid #1a3a5c;transition:all 0.3s}
+.pc-card.safe{border-color:#43a047}
+.pc-card.remote{border-color:#0288d1;background:#0d233a}
+.pc-card.isolated{border-color:#e53935;background:#1a0a0a;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 5px #e53935}50%{box-shadow:0 0 20px #e53935}}
+.pc-name{font-size:16px;font-weight:bold;color:#4fc3f7}
+.pc-ip{font-size:12px;color:#78909c;font-family:monospace;margin:3px 0}
+.pc-status{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:bold;margin:5px 0}
+.status-safe{background:#1b5e20;color:#a5d6a7}
+.status-remote{background:#01579b;color:#81d4fa}
+.status-isolated{background:#b71c1c;color:#ef9a9a}
+.panel{background:#111d2e;border-radius:10px;padding:20px;border:1px solid #1a3a5c;margin-bottom:20px}
+.panel h2{color:#4fc3f7;font-size:18px;margin-bottom:15px}
+.btn{padding:10px 20px;border:none;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer;margin:4px}
+.btn-red{background:#e53935;color:white}
+.btn-green{background:#43a047;color:white}
+select{padding:8px 12px;background:#0a1628;color:white;border:1px solid #1e88e5;border-radius:6px;font-size:13px}
+.pred-box{background:#1a2a3a;border-radius:8px;padding:12px;margin:8px 0;border-left:4px solid #ff9800}
+.alert-banner{background:#b71c1c;color:white;padding:15px;border-radius:8px;text-align:center;font-size:16px;font-weight:bold;margin-bottom:15px;animation:pulse 1s infinite}
+.tag-badge{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:bold;text-transform:uppercase}
+.tag-lan{background:#2e7d32;color:white}
+.tag-wan{background:#0288d1;color:white}
+.back-link{color:#4fc3f7;text-decoration:none;font-size:14px;background:rgba(79,195,247,0.1);padding:6px 14px;border-radius:15px;border:1px solid #4fc3f7}
+</style></head><body>
+<header class="header">
+<h1>🌐 Hybrid Network Command Center (LAN + Cloud Endpoints)</h1>
+<div><a href="/" class="back-link">← Dashboard</a></div>
+</header>
+<div class="container">
+<div id="alertBox"></div>
+
+<h2 style="color:#4fc3f7;margin:15px 0">🏠 1. Local LAN/WiFi Devices (Nearby)</h2>
+<div class="grid" id="localGrid"></div>
+
+<h2 style="color:#4fc3f7;margin:25px 0 15px 0">🌍 2. Remote Internet Endpoints (Agent Telemetry via Cloud)</h2>
+<div class="grid" id="remoteGrid"></div>
+
+<div class="panel">
+<h2>🚨 Universal EDR Isolation Trigger</h2>
+<p style="color:#78909c;font-size:13px;margin-bottom:10px">Select any Local device OR Remote Cloud agent to simulate threat detection. The central server will issue an instant Isolation protocol.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+<label style="font-size:13px">Target Endpoint:</label>
+<select id="targetSelect"></select>
+<button class="btn btn-red" onclick="launchAttack()">🚨 TRIGGER ISOLATION</button>
+<button class="btn btn-green" onclick="resetNetwork()">🔄 REFRESH ALL</button>
+</div>
+</div>
+<div class="panel" id="predPanel" style="display:none">
+<h2>🤖 AI Threat Propagation Estimation</h2>
+<div id="predContent"></div>
+</div>
+</div>
+<script>
+function loadNodes(){
+fetch('/api/network').then(r=>r.json()).then(data=>{
+let localHtml='', remoteHtml='', selectHtml='';
+let hasAlert=false;
+
+// 1. Local devices render
+data.local_devices.forEach(n=>{
+let cls=n.status==='isolated'?'isolated':'safe';
+let stCls=n.status==='isolated'?'status-isolated':'status-safe';
+let stTxt=n.status==='isolated'?'🔒 ISOLATED':'✅ ACTIVE';
+if(n.status==='isolated')hasAlert=true;
+localHtml+=`<div class="pc-card ${cls}">
+<div class="pc-name"><span class="tag-badge tag-lan">LAN</span> 💻 ${n.hostname}</div>
+<div class="pc-ip">IP: ${n.ip}</div>
+<span class="pc-status ${stCls}">${stTxt}</span>
+</div>`;
+selectHtml += `<option value="${n.ip}">[LAN] ${n.ip} (${n.hostname})</option>`;
+});
+document.getElementById('localGrid').innerHTML=localHtml;
+
+// 2. Remote Cloud Agents render
+if(data.remote_agents.length === 0){
+remoteHtml = '<div style="padding:20px; color:#78909c">No remote internet agents reporting right now. Run `python agent.py` on any outside PC!</div>';
+} else {
+data.remote_agents.forEach(a=>{
+let cls=a.status==='isolated'?'isolated':'remote';
+let stCls=a.status==='isolated'?'status-isolated':'status-remote';
+let stTxt=a.status==='isolated'?'🔒 ISOLATED':'🌍 CLOUD ACTIVE';
+if(a.status==='isolated')hasAlert=true;
+remoteHtml+=`<div class="pc-card ${cls}">
+<div class="pc-name"><span class="tag-badge tag-wan">WAN AGENT</span> 💻 ${a.hostname}</div>
+<div class="pc-ip">Public IP: ${a.public_ip} | OS: ${a.os}</div>
+<span class="pc-status ${stCls}">${stTxt}</span>
+<div style="font-size:12px; margin-top:5px; color:#90a4ae">CPU: ${a.cpu}% | RAM: ${a.ram}% | Last Sync: ${a.last_seen}</div>
+</div>`;
+selectHtml += `<option value="${a.hostname}">[CLOUD AGENT] ${a.hostname}</option>`;
+});
+}
+document.getElementById('remoteGrid').innerHTML=remoteHtml;
+document.getElementById('targetSelect').innerHTML=selectHtml;
+
+if(hasAlert){
+document.getElementById('alertBox').innerHTML='<div class="alert-banner">🚨 EMERGENCY ALERT: Malicious Payload Quarantined! Node Auto-Isolated across Network! 🚨</div>';
+}else{
+document.getElementById('alertBox').innerHTML='';
+}
+});
+}
+function launchAttack(){
+let t=document.getElementById('targetSelect').value;
+if(!t)return;
+fetch('/api/attack',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target:t,type:'ransomware'})})
+.then(r=>r.json()).then(data=>{
+loadNodes();
+if(data.predictions){
+let html='<p style="color:#ff9800;margin-bottom:10px">Cross-subnet AI vulnerability propagation scores:</p>';
+for(let pc in data.predictions){
+let risk=data.predictions[pc];
+html+=`<div class="pred-box"><strong style="color:#ff9800">${pc}: ${risk}% Potential Lateral Vector</strong></div>`;
+}
+document.getElementById('predContent').innerHTML=html;
+document.getElementById('predPanel').style.display='block';
+}
+});
+}
+function resetNetwork(){
+fetch('/api/reset').then(r=>r.json()).then(()=>{loadNodes();document.getElementById('predPanel').style.display='none';});
+}
+loadNodes();
+setInterval(loadNodes,3000);
+</script>
+</body></html>

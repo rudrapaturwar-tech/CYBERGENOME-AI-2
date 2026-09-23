@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>User Management | Admin</title>
+<style>
+body{font-family:Segoe UI,sans-serif;background:#0b1220;color:#e2e8f0;margin:0;padding:24px}
+.wrap{max-width:1100px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+h1{font-size:22px;margin:0;color:#f87171}
+.sub{color:#94a3b8;font-size:13px}
+a.nav{color:#38bdf8;text-decoration:none;font-weight:700;margin-right:14px;font-size:13px}
+.msg{background:#064e3b;border:1px solid #059669;color:#a7f3d0;padding:12px;border-radius:10px;margin-bottom:14px;font-size:13px}
+.card{background:#111827;border:1px solid #1e293b;border-radius:14px;padding:20px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:12px 8px;border-bottom:1px solid #1e293b;text-align:left;vertical-align:middle}
+th{color:#93c5fd;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800}
+.admin{background:#7f1d1d;color:#fecaca}
+.analyst{background:#1e3a8a;color:#bfdbfe}
+form.inline{display:inline-block;margin-right:6px}
+button{padding:7px 12px;border-radius:8px;border:0;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+.grant{background:#059669}
+.limit{background:#d97706}
+.del{background:#b91c1c}
+button:disabled{opacity:.35;cursor:not-allowed}
+.warn{margin-top:16px;background:#422006;border-left:4px solid #d97706;color:#fde68a;padding:12px;font-size:12px;border-radius:6px}
+</style></head><body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>User Access Management</h1>
+      <p class="sub">Only Admin can grant or revoke full access. Users cannot self-promote.</p>
+    </div>
+    <div>
+      <a class="nav" href="/">Dashboard</a>
+      <a class="nav" href="/profile">Profile</a>
+      <a class="nav" href="/logout">Logout</a>
+    </div>
+  </div>
+  
+  {% if msg %}<div class="msg">{{ msg }}</div>{% endif %}
+  
+  <div class="card">
+    <table>
+      <thead><tr><th>ID</th><th>Username</th><th>Full Name</th><th>Email</th><th>Current Role</th><th>Admin Actions</th></tr></thead>
+      <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td><b>{{ u.username }}</b>{% if u.username == current_user %} <span style="color:#22d3ee;font-size:10px">(you)</span>{% endif %}</td>
+        <td>{{ u.full_name or '—' }}</td>
+        <td>{{ u.email or '—' }}</td>
+        <td><span class="badge {{ u.role }}">{{ u.role|upper }}</span></td>
+        <td>
+          <form class="inline" method="POST" action="/admin/users/{{ u.id }}/set-role" onsubmit="return confirm('Grant FULL Admin access to {{ u.username }}?')">
+            <input type="hidden" name="role" value="admin">
+            <button class="grant" type="submit" {% if u.role=='admin' %}disabled{% endif %}>Grant Full Access</button>
+          </form>
+          <form class="inline" method="POST" action="/admin/users/{{ u.id }}/set-role" onsubmit="return confirm('Limit {{ u.username }} to Analyst?')">
+            <input type="hidden" name="role" value="analyst">
+            <button class="limit" type="submit" {% if u.role=='analyst' %}disabled{% endif %}>Set Analyst</button>
+          </form>
+          <form class="inline" method="POST" action="/admin/users/{{ u.id }}/delete" onsubmit="return confirm('Permanently DELETE {{ u.username }}?')">
+            <button class="del" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="warn">
+    <b>Rules:</b><br>
+    • Public /register → Always creates Analyst<br>
+    • Only YOU (Admin) can grant Admin role from here<br>
+    • Analyst = Scan + View only (no kill/quarantine/isolate/user manage)<br>
+    • Last Admin cannot be demoted or deleted (safety lock)
+  </div>
+</div>
+</body></html>

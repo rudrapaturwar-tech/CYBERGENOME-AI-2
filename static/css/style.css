@@ -1,0 +1,10 @@
+/* Basic CSS Reset */
+body { font-family: sans-serif; background-color: #f4f6f9; color: #333; margin: 0; padding: 0; }
+.header { background: #1e3a5f; color: white; padding: 20px; text-align: center; }
+.container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.stat-card { background: white; padding: 20px; text-align: center; border-radius: 8px; border: 1px solid #ddd; }
+.scan-input { width: 80%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+.scan-btn { padding: 10px 20px; font-size: 16px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+

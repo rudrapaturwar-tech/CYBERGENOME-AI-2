@@ -1,0 +1,431 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Endpoint Guard | CYBERGENOME AI 2.0</title>
+<style>
+:root{
+  --bg:#f1f5f9;
+  --panel:#ffffff;
+  --soft:#f8fafc;
+  --line:#e2e8f0;
+  --text:#0f172a;
+  --muted:#64748b;
+  --navy:#1e3a5f;
+  --blue:#2563eb;
+  --green:#059669;
+  --amber:#d97706;
+  --red:#dc2626;
+  --shadow:0 8px 24px rgba(15,23,42,.06);
+  --radius:14px;
+  --font:Segoe UI,Inter,system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+a{color:var(--blue);text-decoration:none;font-weight:700}
+.wrap{width:min(1200px,calc(100% - 28px));margin:0 auto;padding:0 0 48px}
+
+/* TOP BAR */
+.userbar{
+  background:#0f172a;color:#e2e8f0;padding:11px 18px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  border-bottom:2px solid #1e40af;
+}
+.userbar .left{display:flex;align-items:center;gap:10px;font-size:13px;flex-wrap:wrap}
+.userbar .right{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;align-items:center}
+.userbar a{color:#22d3ee}
+.userbar a.out{color:#f87171}
+.role-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800}
+.role-admin{background:#7f1d1d;color:#fecaca}
+.role-analyst{background:#1e3a8a;color:#bfdbfe}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,#1e3a5f 0%,#1d4ed8 55%,#2563eb 100%);
+  color:#fff;border-radius:0 0 18px 18px;padding:18px 20px;margin-bottom:18px;
+  box-shadow:0 12px 28px rgba(37,99,235,.18);
+}
+.header h1{font-size:1.35rem;font-weight:800;margin:0}
+.header p{opacity:.9;font-size:.85rem;margin-top:4px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.nav a{
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  color:#fff;padding:7px 12px;border-radius:999px;font-size:.75rem;font-weight:700;
+}
+
+/* CARDS / KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);
+}
+.kpi .l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.kpi .v{margin-top:8px;font-size:1.45rem;font-weight:800;color:var(--navy)}
+.kpi .h{margin-top:4px;font-size:.75rem;color:var(--muted)}
+
+.sec{margin:18px 0 10px;font-size:.95rem;font-weight:800;color:var(--navy)}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:18px;margin-bottom:14px;box-shadow:var(--shadow);
+}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.card-head h3{font-size:.95rem;color:var(--navy);margin:0}
+.card-head span{font-size:.75rem;color:var(--muted)}
+
+.muted{color:var(--muted)}
+.warn{
+  background:#fffbeb;border:1px solid #fde68a;color:#92400e;
+  padding:12px 14px;border-radius:12px;font-size:.85rem;margin-bottom:12px;line-height:1.45;
+}
+.okbox{
+  background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;
+  padding:12px 14px;border-radius:12px;font-size:.85rem;margin-bottom:12px;
+}
+
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--navy);font-size:.72rem;text-transform:uppercase;letter-spacing:.3px;background:var(--soft)}
+.pid{font-family:ui-monospace,Consolas,monospace;font-size:.78rem}
+.exe{font-size:.7rem;color:var(--muted);word-break:break-all;margin-top:2px}
+
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:.7rem;font-weight:800}
+.p-1,.p-2{background:#ecfdf5;color:var(--green)}
+.p-3{background:#fffbeb;color:var(--amber)}
+.p-4,.p-5{background:#fef2f2;color:var(--red)}
+
+.btn{
+  border:0;border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:800;color:#fff;
+  background:var(--blue);font-size:.78rem;
+}
+.btn:hover{filter:brightness(1.05)}
+.btn-danger{background:var(--red)}
+.btn-warn{background:var(--amber)}
+
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type=text]{
+  flex:1;min-width:220px;background:#fff;border:1px solid #dbe3ee;
+  color:var(--text);border-radius:12px;padding:11px 14px;outline:none;font-size:.9rem;
+}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+
+.list{list-style:none}
+.list li{padding:8px 0;border-bottom:1px solid var(--line);font-size:.85rem}
+.footer{text-align:center;color:var(--muted);font-size:.78rem;padding:18px 8px}
+.msgbox{
+  display:none;margin-top:10px;padding:10px 12px;border-radius:10px;font-size:.82rem;
+}
+.msg-ok{display:block;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+.msg-err{display:block;background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+</style>
+</head>
+<body>
+
+<!-- TOP USER BAR -->
+<div class="userbar">
+  <div class="left">
+    <span>👤 <b>{{ full_name or current_user or 'Guest' }}</b></span>
+    <span class="role-badge {% if is_admin %}role-admin{% else %}role-analyst{% endif %}">
+      {{ (current_role or 'analyst')|upper }}
+    </span>
+  </div>
+  <div class="right">
+    <a href="/">Dashboard</a>
+    <a href="/profile">Profile</a>
+    {% if is_admin %}
+    <a href="/admin/users" style="color:#fbbf24">User Management</a>
+    {% endif %}
+    <a href="/network">Network</a>
+    <a href="/tools/encode">Encoding</a>
+    <a class="out" href="/logout">Logout</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="header">
+    <h1>Endpoint Guard v1 + Behavior AI</h1>
+    <p>Live process monitor · Startup check · Quarantine · UEBA host risk (this PC only)</p>
+    <div class="nav">
+      <a href="/">Dashboard</a>
+      <a href="/endpoint">Endpoint Guard</a>
+      <a href="/network">Network Center</a>
+      <a href="/tools/encode">Encoding Toolkit</a>
+      {% if is_admin %}<a href="/admin/users">User Access</a>{% endif %}
+    </div>
+  </header>
+
+  <!-- ACCESS NOTE -->
+  {% if is_admin %}
+  <div class="okbox">
+    <b>Admin access:</b> You can view processes, kill high-risk processes (with confirm), and quarantine files.
+  </div>
+  {% else %}
+  <div class="warn">
+    <b>Analyst view-only:</b> Process Kill &amp; Quarantine require Admin role. Contact Admin to Grant Full Access.
+  </div>
+  {% endif %}
+
+  <!-- KPI -->
+  <section class="kpis">
+    <div class="kpi">
+      <div class="l">Host Risk Level</div>
+      <div class="v" style="color:{% if live and live.level >= 4 %}var(--red){% elif live and live.level >= 3 %}var(--amber){% else %}var(--green){% endif %}">
+        {{ live.level if live else 1 }}/5
+      </div>
+      <div class="h">{{ live.label if live else 'NORMAL' }}</div>
+    </div>
+    <div class="kpi">
+      <div class="l">Behavior Score</div>
+      <div class="v">{{ live.score if live else 0 }}/100</div>
+      <div class="h">UEBA snapshot</div>
+    </div>
+    <div class="kpi">
+      <div class="l">CPU / RAM</div>
+      <div class="v" style="font-size:1.2rem">
+        {{ live.features.cpu if live and live.features else 0 }}% /
+        {{ live.features.mem if live and live.features else 0 }}%
+      </div>
+      <div class="h">Live host metrics</div>
+    </div>
+    <div class="kpi">
+      <div class="l">Connections</div>
+      <div class="v">{{ live.features.conn_count if live and live.features else 0 }}</div>
+      <div class="h">Network sockets</div>
+    </div>
+  </section>
+
+  <!-- AI NOTE -->
+  <div class="sec">Behavior AI Observer</div>
+  <section class="card">
+    <div class="card-head">
+      <h3>Self-learning host baseline</h3>
+      <span>{{ live.ts if live else '' }}</span>
+    </div>
+    <p style="font-size:.9rem;margin-bottom:10px">
+      <b>AI note:</b> {{ live.ai_note if live else 'Observer ready' }}
+    </p>
+    {% if live and live.reasons and live.reasons|length > 0 %}
+    <ul class="list">
+      {% for r in live.reasons %}
+      <li>• {{ r }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No rule anomalies in this sample.</p>
+    {% endif %}
+
+    {% if summary %}
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:.85rem">
+      <b>Today summary:</b>
+      Date {{ summary.date }} ·
+      Samples {{ summary.samples }} ·
+      Anomalies {{ summary.anomalies }} ·
+      Avg score {{ summary.avg_score }}
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- PROCESSES -->
+  <div class="sec">Live Running Processes</div>
+  <section class="card">
+    <div class="card-head">
+      <h3>Top processes by risk / CPU</h3>
+      <span>Static inspection</span>
+    </div>
+
+    <div id="actionMsg" class="msgbox"></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>PID</th>
+            <th>Name / Path</th>
+            <th>CPU</th>
+            <th>Mem</th>
+            <th>Risk</th>
+            <th>Reasons</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if procs and procs|length > 0 %}
+            {% for p in procs %}
+            <tr>
+              <td class="pid">{{ p.pid }}</td>
+              <td>
+                <div><b>{{ p.name }}</b></div>
+                {% if p.exe %}<div class="exe">{{ p.exe }}</div>{% endif %}
+              </td>
+              <td>{{ p.cpu }}%</td>
+              <td>{{ p.mem }}%</td>
+              <td>
+                <span class="pill p-{{ p.risk if p.risk <= 5 else 5 }}">{{ p.risk }}/5</span>
+              </td>
+              <td style="font-size:.75rem;color:var(--muted)">
+                {% if p.reasons and p.reasons|length > 0 %}
+                  {{ p.reasons|join(', ') }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>
+                {% if is_admin and p.risk >= 3 and p.pid %}
+                <button class="btn btn-danger" type="button" data-pid="{{ p.pid }}" data-name="{{ p.name }}" onclick="killBtn(this)">
+                  Kill
+                </button>
+                {% elif is_admin %}
+                <span class="muted">—</span>
+                {% else %}
+                <span class="muted">View only</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" style="text-align:center;padding:18px" class="muted">
+                No process data available.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- QUARANTINE -->
+  <div class="sec">File Quarantine</div>
+  <section class="card">
+    <div class="card-head">
+      <h3>Safe quarantine (move only)</h3>
+      <span>Never executes the file</span>
+    </div>
+
+    {% if is_admin %}
+    <div class="row">
+      <input id="qpath" type="text" placeholder="C:\Users\...\Downloads\sample.exe">
+      <button class="btn btn-warn" type="button" onclick="quar()">Quarantine File</button>
+    </div>
+    <div id="quarMsg" class="msgbox"></div>
+    {% else %}
+    <div class="warn">
+      Quarantine is <b>Admin only</b>.
+    </div>
+    {% endif %}
+
+    <h4 style="margin:16px 0 8px;font-size:.9rem;color:var(--navy)">Quarantine folder</h4>
+    {% if quarantine and quarantine|length > 0 %}
+    <ul class="list">
+      {% for q in quarantine %}
+      <li>
+        <b>{{ q.name }}</b>
+        <span class="muted"> · {{ q.size }} bytes</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No quarantined files yet.</p>
+    {% endif %}
+  </section>
+
+  <!-- STARTUP -->
+  <div class="sec">Startup Folder Check</div>
+  <section class="card">
+    <div class="card-head">
+      <h3>User startup entries</h3>
+      <span>Persistence indicator</span>
+    </div>
+    {% if startups and startups|length > 0 %}
+    <ul class="list">
+      {% for s in startups %}
+      <li>
+        <span class="pill p-{{ s.risk if s.risk <= 5 else 5 }}">risk {{ s.risk }}</span>
+        <b style="margin-left:8px">{{ s.name }}</b>
+        <div class="exe">{{ s.path }}</div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No startup entries found.</p>
+    {% endif %}
+  </section>
+
+  <div class="footer">
+    CYBERGENOME AI 2.0 · Endpoint Guard
+  </div>
+</div>
+
+<script>
+function showMsg(id, text, ok){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.className = 'msgbox ' + (ok ? 'msg-ok' : 'msg-err');
+  el.textContent = text;
+  el.style.display = 'block';
+}
+
+function killBtn(btn){
+  var pid = btn.getAttribute('data-pid');
+  var name = btn.getAttribute('data-name');
+  killPid(pid, name);
+}
+
+async function killPid(pid, name){
+  if(!confirm('Terminate process PID ' + pid + (name ? ' (' + name + ')' : '') + ' ?')){
+    return;
+  }
+  try{
+    var r = await fetch('/api/endpoint/kill', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({pid: pid, confirm: true})
+    });
+    if(r.status === 403){
+      showMsg('actionMsg', 'Access Denied: Admin only.', false);
+      return;
+    }
+    var j = await r.json();
+    showMsg('actionMsg', j.msg || JSON.stringify(j), !!j.ok);
+    if(j.ok){
+      setTimeout(function(){ location.reload(); }, 800);
+    }
+  }catch(e){
+    showMsg('actionMsg', 'Request failed: ' + e, false);
+  }
+}
+
+async function quar(){
+  var path = (document.getElementById('qpath').value || '').trim();
+  if(!path){
+    showMsg('quarMsg', 'Please enter a full file path.', false);
+    return;
+  }
+  if(!confirm('Quarantine (move) this file?\n\n' + path)){
+    return;
+  }
+  try{
+    var r = await fetch('/api/endpoint/quarantine', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({path: path})
+    });
+    if(r.status === 403){
+      showMsg('quarMsg', 'Access Denied: Admin only.', false);
+      return;
+    }
+    var j = await r.json();
+    showMsg('quarMsg', j.msg || JSON.stringify(j), !!j.ok);
+    if(j.ok){
+      setTimeout(function(){ location.reload(); }, 800);
+    }
+  }catch(e){
+    showMsg('quarMsg', 'Request failed: ' + e, false);
+  }
+}
+</script>
+</body>
+</html>

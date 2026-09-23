@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Register | CYBERGENOME AI</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Segoe UI,sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;padding:20px}
+.card{width:100%;max-width:440px;background:#111827;border:1px solid #059669;border-radius:16px;padding:32px}
+h1{font-size:22px;margin:0 0 6px;text-align:center;color:#34d399}
+p{text-align:center;color:#94a3b8;font-size:13px;margin:0 0 16px}
+label{display:block;font-size:11px;color:#93c5fd;font-weight:800;margin:12px 0 6px;text-transform:uppercase}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#020617;color:#fff;box-sizing:border-box;font-size:14px}
+input:focus{outline:none;border-color:#059669}
+button{width:100%;margin-top:20px;padding:13px;border:0;border-radius:10px;background:linear-gradient(135deg,#059669,#047857);color:#fff;font-weight:800;cursor:pointer;font-size:14px}
+.msg{padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px}
+.err{background:#450a0a;border:1px solid #7f1d1d;color:#fecaca}
+.ok{background:#064e3b;border:1px solid #059669;color:#a7f3d0}
+.note{background:#422006;border-left:4px solid #d97706;padding:12px;font-size:12px;color:#fde68a;margin-bottom:14px;border-radius:6px}
+.links{text-align:center;margin-top:16px;font-size:13px}
+.links a{color:#22d3ee;font-weight:700;text-decoration:none}
+</style></head><body>
+<div class="card">
+  <h1>Create Account</h1>
+  <p>Public Registration → Security Analyst Only</p>
+  <div class="note"><b>Note:</b> Full Admin access can only be granted by an existing Admin from User Management panel. You cannot self-promote to Admin.</div>
+  {% if error %}<div class="msg err">{{ error }}</div>{% endif %}
+  {% if success %}<div class="msg ok">{{ success }}</div>{% endif %}
+  <form method="POST" action="/register">
+    <label>Full Name</label>
+    <input name="full_name" placeholder="Your Full Name">
+    <label>Username (min 3, letters/numbers/underscore)</label>
+    <input name="username" required pattern="[a-z0-9_]{3,}">
+    <label>Email (optional)</label>
+    <input type="email" name="email">
+    <label>Password (min 6)</label>
+    <input type="password" name="password" required minlength="6">
+    <button type="submit">Register as Analyst</button>
+  </form>
+  <div class="links"><a href="/login">Back to Login</a></div>
+</div>
+</body></html>

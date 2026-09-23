@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | CYBERGENOME AI</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Segoe UI,sans-serif;background:#0b1220;color:#e2e8f0}
+.card{width:100%;max-width:400px;background:#111827;border:1px solid #1e293b;border-radius:16px;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,.4)}
+h1{font-size:20px;margin:0 0 6px;text-align:center}
+p{text-align:center;color:#94a3b8;font-size:13px;margin:0 0 18px}
+label{display:block;font-size:11px;color:#93c5fd;font-weight:700;margin:12px 0 6px;text-transform:uppercase}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#020617;color:#fff;box-sizing:border-box}
+button{width:100%;margin-top:16px;padding:12px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer}
+.err{background:#450a0a;border:1px solid #7f1d1d;color:#fecaca;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px}
+.links{text-align:center;margin-top:16px;font-size:13px;color:#94a3b8}
+.links a{color:#22d3ee;font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>CYBERGENOME AI 2.0</h1>
+  <p>Secure SOC Login</p>
+  {% if error %}<div class="err">{{ error }}</div>{% endif %}
+  <form method="POST" action="/login">
+    <label>Username</label>
+    <input name="username" required autofocus>
+    <label>Password</label>
+    <input type="password" name="password" required>
+    <button type="submit">Login</button>
+  </form>
+  <div class="links">New user? <a href="/register">Create Analyst account</a></div>
+  <div class="links" style="margin-top:8px;font-size:11px">Default admin: admin / cybergenome2025</div>
+</div>
+</body>
+</html>

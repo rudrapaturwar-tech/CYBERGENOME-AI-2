@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+database/*.db
+database/intel_cache/
+uploads/*
+models/*.pkl
+.env
+.vscode/
+.idea/
+*.log
+quarantine/*
+!uploads/.gitkeep
+!quarantine/.gitkeep

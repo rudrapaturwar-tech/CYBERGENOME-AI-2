@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Profile | CYBERGENOME</title>
+<style>
+body{font-family:Segoe UI,sans-serif;background:#0b1220;margin:0;padding:30px;color:#e2e8f0}
+.card{max-width:560px;margin:0 auto;background:#111827;border:1px solid #1e293b;border-radius:16px;padding:28px;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+h1{font-size:22px;margin:0 0 6px;color:#38bdf8}
+.sub{color:#94a3b8;font-size:13px;margin:0 0 20px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #1e293b;font-size:14px}
+.badge{padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800}
+.admin{background:#7f1d1d;color:#fecaca}
+.analyst{background:#1e3a8a;color:#bfdbfe}
+.info{margin-top:16px;padding:12px;border-radius:8px;font-size:13px}
+.limited{background:#422006;border:1px solid #d97706;color:#fde68a}
+.full{background:#064e3b;border:1px solid #059669;color:#a7f3d0}
+a{display:inline-block;margin:18px 8px 0 0;padding:11px 18px;border-radius:10px;background:#2563eb;color:#fff;text-decoration:none;font-weight:800;font-size:13px}
+a.admin-btn{background:#dc2626}
+a.logout{background:#64748b}
+</style></head><body>
+<div class="card">
+  <h1>My Profile</h1>
+  <p class="sub">CYBERGENOME AI Account Details</p>
+  <div class="row"><span>Username</span><b>{{ user.username }}</b></div>
+  <div class="row"><span>Full Name</span><b>{{ user.full_name or '—' }}</b></div>
+  <div class="row"><span>Email</span><b>{{ user.email or '—' }}</b></div>
+  <div class="row"><span>Role</span><span class="badge {{ user.role }}">{{ user.role|upper }}</span></div>
+  <div class="row"><span>Joined</span><b>{{ user.created_at }}</b></div>
+  
+  {% if user.role == 'analyst' %}
+  <div class="info limited">
+    <b>Limited Access:</b> URL/File Scanning, History, AI Copilot, Encoding Tools.<br>
+    <b>Blocked:</b> Process Kill, Quarantine, Network Isolation, User Management.<br>
+    Contact your Admin to request full access.
+  </div>
+  {% else %}
+  <div class="info full">
+    <b>Full Admin Access:</b> You have complete SOC control. You can grant/revoke Admin access to any user from the User Management panel.
+  </div>
+  {% endif %}
+  
+  <a href="/">Dashboard</a>
+  {% if is_admin %}<a class="admin-btn" href="/admin/users">Manage Users</a>{% endif %}
+  <a class="logout" href="/logout">Logout</a>
+</div>
+</body></html>

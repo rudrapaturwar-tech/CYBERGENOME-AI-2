@@ -1,0 +1,594 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBERGENOME AI 2.0 | SOC Dashboard</title>
+<style>
+:root{
+  --bg:#f1f5f9;
+  --panel:#ffffff;
+  --soft:#f8fafc;
+  --line:#e2e8f0;
+  --text:#0f172a;
+  --muted:#64748b;
+  --navy:#1e3a5f;
+  --blue:#2563eb;
+  --green:#059669;
+  --amber:#d97706;
+  --red:#dc2626;
+  --shadow:0 8px 24px rgba(15,23,42,.06);
+  --radius:14px;
+  --font:Segoe UI,Inter,system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+.wrap{width:min(1200px,calc(100% - 28px));margin:0 auto;padding:0 0 48px}
+
+/* TOP USER BAR */
+.userbar{
+  background:#0f172a;color:#e2e8f0;padding:11px 18px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  border-bottom:2px solid #1e40af;
+}
+.userbar .left{display:flex;align-items:center;gap:10px;font-size:13px;flex-wrap:wrap}
+.userbar .right{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;align-items:center}
+.userbar a{color:#22d3ee;font-weight:700}
+.userbar a.out{color:#f87171}
+.role-badge{
+  padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800;
+}
+.role-admin{background:#7f1d1d;color:#fecaca}
+.role-analyst{background:#1e3a8a;color:#bfdbfe}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,#1e3a5f 0%,#1d4ed8 55%,#2563eb 100%);
+  color:#fff;border-radius:0 0 18px 18px;padding:18px 20px;margin-bottom:18px;
+  box-shadow:0 12px 28px rgba(37,99,235,.18);
+}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.header h1{font-size:1.45rem;font-weight:800;letter-spacing:.2px}
+.header .sub{opacity:.9;font-size:.85rem;margin-top:4px}
+.online{
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+  color:#fff;padding:7px 12px;border-radius:999px;font-size:.75rem;font-weight:700;
+}
+.nav{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.18);
+}
+.nav a{
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  color:#fff;padding:8px 12px;border-radius:999px;font-size:.78rem;font-weight:700;
+}
+.nav a:hover{background:rgba(255,255,255,.24)}
+.nav a.admin-only{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.45)}
+
+/* MODULES */
+.modules{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:0 0 16px;padding:0 0}
+.mod{
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;box-shadow:var(--shadow);
+}
+.mod b{display:block;color:var(--navy);font-size:.85rem;margin-bottom:4px}
+.mod span{font-size:.75rem;color:var(--muted)}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);
+}
+.kpi .l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.45px;font-weight:700}
+.kpi .v{margin-top:8px;font-size:1.55rem;font-weight:800;color:var(--navy)}
+.kpi .h{margin-top:4px;font-size:.75rem;color:var(--muted)}
+
+.sec{margin:18px 0 10px;font-size:.95rem;font-weight:800;color:var(--navy)}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:18px;margin-bottom:14px;box-shadow:var(--shadow);
+}
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+@media(max-width:980px){.grid2{grid-template-columns:1fr}}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.card-head h3{font-size:.95rem;color:var(--navy)}
+.card-head span{font-size:.75rem;color:var(--muted)}
+
+.row{display:flex;gap:10px;flex-wrap:wrap}
+input[type=text],input[type=file]{
+  flex:1;min-width:220px;background:#fff;border:1px solid #dbe3ee;
+  color:var(--text);border-radius:12px;padding:12px 14px;outline:none;font-size:.92rem;
+}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.btn{
+  border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;color:#fff;
+  background:var(--blue);box-shadow:0 8px 18px rgba(37,99,235,.2);
+}
+.btn:hover{filter:brightness(1.05)}
+
+.pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:.72rem;font-weight:800}
+.p-low{background:#ecfdf5;color:var(--green)}
+.p-medium,.p-med{background:#fffbeb;color:var(--amber)}
+.p-high{background:#fef2f2;color:var(--red)}
+.mitre{
+  display:inline-block;margin-top:8px;padding:5px 9px;border-radius:8px;
+  background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;
+  font-size:.72rem;font-family:ui-monospace,Consolas,monospace;font-weight:700;
+}
+
+.siem{
+  background:#0f172a;color:#e2e8f0;border-radius:12px;border:1px solid #1e293b;
+  max-height:210px;overflow:auto;font-family:ui-monospace,Consolas,monospace;font-size:.72rem;
+}
+.siem-row{display:grid;grid-template-columns:110px 95px 1fr;gap:8px;padding:8px 10px;border-bottom:1px solid #1e293b}
+.tag{color:#fda4af;font-weight:800}
+.muted{color:var(--muted)}
+.muted-dark{color:#94a3b8}
+
+.hr{height:1px;background:var(--line);margin:14px 0}
+.target{color:#1d4ed8;word-break:break-all;margin:4px 0 8px;font-weight:600}
+.score3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+@media(max-width:700px){.score3{grid-template-columns:1fr}}
+.mini{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.mini .l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:800}
+.mini .v{margin-top:6px;font-size:1.25rem;font-weight:800;color:var(--navy)}
+.ioc{margin-top:12px;padding:12px;border-radius:12px;font-size:.85rem}
+.ioc-hit{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.ioc-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+.dna{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px}
+.dna div{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.dna strong{display:block;font-size:.68rem;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.ind{font-size:.88rem;margin:5px 0;color:#334155}
+
+.chart{display:flex;align-items:flex-end;gap:8px;height:150px;border-bottom:1px solid var(--line);padding-top:6px}
+.bw{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.bar{width:100%;max-width:28px;min-height:4px;border-radius:8px 8px 0 0}
+
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{padding:11px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--navy);font-size:.72rem;text-transform:uppercase;letter-spacing:.35px;background:var(--soft)}
+
+.footer{text-align:center;color:var(--muted);font-size:.78rem;padding:16px 8px}
+
+/* CHAT */
+.fab{
+  position:fixed;right:18px;bottom:18px;z-index:1000;width:54px;height:54px;border-radius:50%;
+  border:0;cursor:pointer;font-weight:800;color:#fff;background:var(--blue);
+  box-shadow:0 10px 24px rgba(37,99,235,.28);font-size:14px;
+}
+.chat{
+  position:fixed;right:18px;bottom:82px;z-index:1000;width:min(360px,calc(100vw - 20px));height:430px;
+  display:none;flex-direction:column;overflow:hidden;
+  background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 40px rgba(15,23,42,.14);
+}
+.chat-h{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--navy);color:#fff;font-weight:800;font-size:.85rem}
+.chat-b{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f8fafc}
+.bu{align-self:flex-end;max-width:85%;background:var(--blue);color:#fff;padding:9px 11px;border-radius:14px 14px 4px 14px;font-size:.8rem}
+.bb{align-self:flex-start;max-width:90%;background:#fff;border:1px solid var(--line);color:#0f172a;padding:9px 11px;border-radius:14px 14px 14px 4px;font-size:.8rem;line-height:1.45;white-space:pre-wrap}
+.chat-i{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line);background:#fff}
+.chat-i input{flex:1;background:#fff;border:1px solid #dbe3ee;color:var(--text);border-radius:10px;padding:9px 11px}
+</style>
+</head>
+<body>
+
+<!-- TOP USER BAR -->
+<div class="userbar">
+  <div class="left">
+    <span>👤 <b>{{ full_name or current_user or 'Guest' }}</b></span>
+    <span class="role-badge {% if is_admin %}role-admin{% else %}role-analyst{% endif %}">
+      {{ (current_role or 'analyst')|upper }}
+    </span>
+  </div>
+  <div class="right">
+    <a href="/profile">Profile</a>
+    {% if is_admin %}
+    <a href="/admin/users" style="color:#fbbf24">User Management</a>
+    {% endif %}
+    <a href="/endpoint">Endpoint</a>
+    <a href="/network">Network</a>
+    <a href="/tools/encode">Encoding</a>
+    {% if is_admin %}
+    <a href="/api/intel/status" target="_blank">IOC Status</a>
+    {% endif %}
+    <a class="out" href="/logout">Logout</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <div>
+        <h1>CYBERGENOME AI 2.0</h1>
+        <div class="sub">AI-Powered Cybersecurity Monitoring &amp; Threat Analysis Platform</div>
+      </div>
+      <span class="online">● SYSTEM ONLINE</span>
+    </div>
+    <nav class="nav" aria-label="Main modules">
+      <a href="#dashboard">Dashboard</a>
+      <a href="#url-scanner">URL Scanner</a>
+      <a href="#file-scanner">File Scanner</a>
+      <a href="#history">History</a>
+      <a href="#activity">Activity Log</a>
+      <a href="/endpoint">Endpoint Guard</a>
+      <a href="/network">Network Center</a>
+      <a href="/tools/encode">Encoding Toolkit</a>
+      {% if is_admin %}
+      <a class="admin-only" href="/admin/users">User Access</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <!-- MODULE MAP -->
+  <section class="modules" id="dashboard">
+    <div class="mod"><b>URL + Cyber DNA</b><span>Risk, MITRE, IOC</span></div>
+    <div class="mod"><b>File Inspector</b><span>Hash, entropy, static</span></div>
+    <div class="mod"><b>Endpoint Guard</b><span>{% if is_admin %}Full EDR control{% else %}View only{% endif %}</span></div>
+    <div class="mod"><b>Network Center</b><span>{% if is_admin %}View + Isolate{% else %}View only{% endif %}</span></div>
+    <div class="mod"><b>Encoding Toolkit</b><span>Base64, Hex, URL</span></div>
+    <div class="mod"><b>AI Copilot</b><span>Chat assistant</span></div>
+  </section>
+
+  <!-- KPI -->
+  <section class="kpis">
+    <div class="kpi">
+      <div class="l">Threats Detected</div>
+      <div class="v">{{ threats_detected }}</div>
+      <div class="h">High-risk findings</div>
+    </div>
+    <div class="kpi">
+      <div class="l">Risk Level</div>
+      <div class="v" style="color:var(--amber)">{{ latest_risk }}</div>
+      <div class="h">Latest classification</div>
+    </div>
+    <div class="kpi">
+      <div class="l">AI Status</div>
+      <div class="v" style="color:var(--green)">READY</div>
+      <div class="h">ML engines online</div>
+    </div>
+    <div class="kpi">
+      <div class="l">URL / File Scans</div>
+      <div class="v">{{ total_url_scans }}/{{ total_file_scans }}</div>
+      <div class="h">Total processed</div>
+    </div>
+  </section>
+
+  <div class="grid2">
+    <section>
+      <div class="sec">SIEM Telemetry</div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Live event stream</h3>
+          <span>Internal + system logs</span>
+        </div>
+        <div class="siem">
+          {% if win_events and win_events|length > 0 %}
+            {% for ev in win_events %}
+            <div class="siem-row">
+              <span class="tag">[{{ ev.id }}]</span>
+              <span class="muted-dark">{{ ev.time }}</span>
+              <span>{{ ev.msg }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="siem-row">
+              <span class="tag">[CG-SYSTEM]</span>
+              <span class="muted-dark">now</span>
+              <span>No events yet. Scan a URL to generate telemetry.</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec">Threat Trend</div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Risk score chart</h3>
+          <span>Recent URL scans</span>
+        </div>
+        {% if chart_data and chart_data|length > 0 %}
+        <div class="chart">
+          {% for i in range(chart_data|length) %}
+          <div class="bw">
+            <div style="font-size:.68rem;margin-bottom:4px;font-weight:700">{{ chart_data[i] }}</div>
+            <div class="bar" style="height:{{ chart_data[i] }}%;background:{% if chart_data[i] >= 60 %}#dc2626{% elif chart_data[i] >= 30 %}#d97706{% else %}#059669{% endif %}"></div>
+            <div class="muted" style="font-size:.62rem;margin-top:5px;max-width:46px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ chart_labels[i] if chart_labels and chart_labels|length > i else '' }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="muted" style="text-align:center;padding:36px 8px">No chart data yet. Scan URLs to build trend.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  <!-- URL SCANNER -->
+  <div class="sec" id="url-scanner">URL Scanner · Cyber DNA · MITRE · IOC</div>
+  <section class="card">
+    <div class="card-head">
+      <h3>URL threat analysis</h3>
+      <span>Rules + AI + global intel</span>
+    </div>
+    <form method="POST" action="/scan-url">
+      <div class="row">
+        <input type="text" name="url" placeholder="https://example.com or suspicious link" required>
+        <button class="btn" type="submit">SCAN URL</button>
+      </div>
+    </form>
+
+    {% if result %}
+    <div class="hr"></div>
+    <div class="muted" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.4px;font-weight:800">Target</div>
+    <div class="target">{{ result.url }}</div>
+    <span class="mitre">MITRE {{ result.mitre_id }}</span>
+
+    <div class="score3">
+      <div class="mini">
+        <div class="l">Score</div>
+        <div class="v">{{ result.risk_score }}/100</div>
+      </div>
+      <div class="mini">
+        <div class="l">Rule</div>
+        <div class="v" style="font-size:1rem">
+          <span class="pill p-{{ result.risk_classification|lower }}">{{ result.risk_classification }}</span>
+        </div>
+      </div>
+      <div class="mini">
+        <div class="l">AI</div>
+        <div class="v" style="font-size:1rem">
+          <span class="pill p-{{ (ai_prediction or 'LOW')|lower }}">{{ ai_prediction or 'LOW' }}</span>
+        </div>
+      </div>
+    </div>
+
+    {% if result.ioc %}
+    <div class="ioc {% if result.ioc.matched %}ioc-hit{% else %}ioc-ok{% endif %}">
+      <b>{% if result.ioc.matched %}GLOBAL IOC MATCH{% else %}GLOBAL INTEL: NO IOC MATCH{% endif %}</b>
+      <div style="margin-top:6px">{{ result.ioc.message }}</div>
+      <div class="muted" style="margin-top:6px;font-size:.75rem">
+        Source: {{ result.ioc.source or 'n/a' }}
+        · Host: {{ result.ioc.host or 'n/a' }}
+        · Boost: +{{ result.ioc.risk_boost or 0 }}
+      </div>
+      {% if result.ioc.tags %}
+      <div class="muted" style="margin-top:4px;font-size:.75rem">
+        Tags: {{ result.ioc.tags|join(', ') }}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if result.reasons %}
+    <div style="margin-top:12px">
+      <div class="muted" style="font-size:.72rem;margin-bottom:6px;text-transform:uppercase;font-weight:800">Indicators</div>
+      {% for reason in result.reasons %}
+      <div class="ind">• {{ reason }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if cyber_dna %}
+    <div class="dna">
+      <div><strong>HTTPS</strong>{{ cyber_dna.https }}</div>
+      <div><strong>Length</strong>{{ cyber_dna.url_length }}</div>
+      <div><strong>Subdomains</strong>{{ cyber_dna.subdomains }}</div>
+      <div><strong>Keywords</strong>{{ cyber_dna.suspicious_keywords }}</div>
+      <div><strong>@ Symbol</strong>{{ cyber_dna.at_symbol }}</div>
+      <div>
+        <strong>Domain</strong>
+        <span style="font-size:.78rem;word-break:break-all">{{ cyber_dna.domain }}</span>
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
+  </section>
+
+  <!-- FILE SCANNER -->
+  <div class="sec" id="file-scanner">File Scanner · Static Analysis</div>
+  <section class="card">
+    <div class="card-head">
+      <h3>File malware inspector</h3>
+      <span>SHA-256 · entropy · extension</span>
+    </div>
+    <form method="POST" action="/scan-file" enctype="multipart/form-data">
+      <div class="row">
+        <input type="file" name="file" required>
+        <button class="btn" type="submit">SCAN FILE</button>
+      </div>
+    </form>
+    <p class="muted" style="font-size:.75rem;margin-top:8px">Static only — files are never executed.</p>
+
+    {% if file_result %}
+    <div style="margin-top:12px;padding:14px;background:var(--soft);border:1px solid var(--line);border-radius:12px">
+      <div>
+        <b>{{ file_result.filename }}</b>
+        · {{ file_result.file_size_display }}
+        · Entropy {{ file_result.entropy }}
+      </div>
+      <div style="margin-top:8px">
+        <span class="pill p-{{ file_result.risk_classification|lower }}">
+          {{ file_result.risk_score }}/100 {{ file_result.risk_classification }}
+        </span>
+      </div>
+      <div class="muted" style="margin-top:8px;font-size:.72rem;word-break:break-all">
+        SHA-256: {{ file_result.sha256_hash }}
+      </div>
+      <span class="mitre">{{ file_result.mitre_id }}</span>
+
+      {% if file_result.ioc %}
+      <div class="ioc {% if file_result.ioc.matched %}ioc-hit{% else %}ioc-ok{% endif %}" style="margin-top:10px">
+        <b>Hash Intel:</b> {{ file_result.ioc.message }}
+      </div>
+      {% endif %}
+
+      {% if file_result.reasons %}
+      <div style="margin-top:10px">
+        {% for reason in file_result.reasons %}
+        <div class="ind">• {{ reason }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if file_error %}
+    <div class="ioc ioc-hit" style="margin-top:12px">{{ file_error }}</div>
+    {% endif %}
+  </section>
+
+  <!-- HISTORY -->
+  <div class="sec" id="history">Recent Scan History</div>
+  <section class="card">
+    {% if recent_url_scans and recent_url_scans|length > 0 %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Domain</th>
+            <th>Score</th>
+            <th>Risk</th>
+            <th>AI</th>
+            <th>MITRE</th>
+            <th>By</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in recent_url_scans %}
+          <tr>
+            <td>{{ s.timestamp }}</td>
+            <td>{{ s.domain }}</td>
+            <td><b>{{ s.risk_score }}</b></td>
+            <td><span class="pill p-{{ s.risk_classification|lower }}">{{ s.risk_classification }}</span></td>
+            <td>{{ s.ai_prediction }}</td>
+            <td style="font-size:.72rem">{{ s.mitre_id }}</td>
+            <td style="font-size:.72rem">{{ s.scanned_by or '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="muted" style="text-align:center;padding:14px">No history yet. Scan a URL above.</p>
+    {% endif %}
+  </section>
+
+  <!-- FILE HISTORY (if any) -->
+  {% if recent_file_scans and recent_file_scans|length > 0 %}
+  <div class="sec">Recent File Scans</div>
+  <section class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Filename</th>
+            <th>Score</th>
+            <th>Risk</th>
+            <th>Entropy</th>
+            <th>By</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in recent_file_scans %}
+          <tr>
+            <td>{{ s.timestamp }}</td>
+            <td>{{ s.filename }}</td>
+            <td><b>{{ s.risk_score }}</b></td>
+            <td><span class="pill p-{{ s.risk_classification|lower }}">{{ s.risk_classification }}</span></td>
+            <td>{{ s.entropy }}</td>
+            <td style="font-size:.72rem">{{ s.scanned_by or '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ACTIVITY -->
+  <div class="sec" id="activity">Activity Log</div>
+  <section class="card">
+    {% if activity_logs and activity_logs|length > 0 %}
+      {% for log in activity_logs[:15] %}
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem;padding:9px 0;border-bottom:1px solid var(--line)">
+        <span class="muted">{{ log.timestamp }}</span>
+        <b style="color:#1d4ed8">{{ log.event_type }}</b>
+        <span>{{ log.target }}</span>
+        {% if log.risk and log.risk != 'NONE' and log.risk != 'SAFE' %}
+        <span class="pill p-{{ log.risk|lower if log.risk in ['LOW','MEDIUM','HIGH'] else 'medium' }}">{{ log.risk }}</span>
+        {% endif %}
+        <span class="muted">{{ log.message }}</span>
+      </div>
+      {% endfor %}
+    {% else %}
+    <p class="muted">No activity yet.</p>
+    {% endif %}
+  </section>
+
+  <div class="footer">
+    CYBERGENOME AI 2.0 · Defensive SOC Platform
+    {% if is_admin %} · Admin Console{% else %} · Analyst Workspace{% endif %}
+  </div>
+</div>
+
+<!-- AI CHATBOT -->
+<button class="fab" type="button" onclick="toggleChat()" title="AI Copilot">AI</button>
+<div class="chat" id="chatWindow">
+  <div class="chat-h">
+    <span>SOC Copilot</span>
+    <span style="cursor:pointer" onclick="toggleChat()">✕</span>
+  </div>
+  <div class="chat-b" id="chatBody">
+    <div class="bb">Namaste {{ full_name or current_user or '' }}.
+Main CYBERGENOME Copilot hoon.
+Try: analyze system · what is phishing · help</div>
+  </div>
+  <div class="chat-i">
+    <input id="chatInput" type="text" placeholder="Ask copilot..." onkeypress="if(event.key==='Enter')sendChat()">
+    <button class="btn" type="button" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script>
+function toggleChat(){
+  var w = document.getElementById('chatWindow');
+  w.style.display = (w.style.display === 'flex') ? 'none' : 'flex';
+}
+function sendChat(){
+  var inp = document.getElementById('chatInput');
+  var body = document.getElementById('chatBody');
+  var txt = (inp.value || '').trim();
+  if(!txt) return;
+  body.innerHTML += '<div class="bu">' + txt.replace(/</g,'&lt;') + '</div>';
+  var id = 't' + Date.now();
+  body.innerHTML += '<div class="bb" id="' + id + '">Thinking...</div>';
+  inp.value = '';
+  body.scrollTop = body.scrollHeight;
+  fetch('/api/assistant', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({message: txt})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var e = document.getElementById(id);
+    if(e) e.innerHTML = d.reply || 'No reply';
+    body.scrollTop = body.scrollHeight;
+  })
+  .catch(function(){
+    var e = document.getElementById(id);
+    if(e) e.innerHTML = 'Assistant error';
+  });
+}
+</script>
+</body>
+</html>
